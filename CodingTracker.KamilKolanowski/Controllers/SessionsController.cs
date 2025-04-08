@@ -1,14 +1,42 @@
 using CodingTracker.KamilKolanowski.Services;
 using CodingTracker.KamilKolanowski.Data;
+using CodingTracker.KamilKolanowski.Enums;
 using Spectre.Console;
 
 namespace CodingTracker.KamilKolanowski.Controllers;
 
 internal class SessionsController : IBaseController
 {
-    private DateTime _startTime;
-    private DateTime _endTime;
-    private decimal _duration;
+    private static DateTime _startTime;
+    private static DateTime _endTime;
+    private decimal _duration; 
+
+    public void AddSessionManually(DatabaseManager databaseManager)
+    {
+        DateTime userSessionStartTime = AnsiConsole.Prompt(
+            new TextPrompt<DateTime>("Add starting date of your session [cadetblue](yyyy-MM-dd HH:mm:ss)[/]:")
+                .Validate(input =>
+                {
+                    if (input.TimeOfDay == TimeSpan.Zero)
+                        return ValidationResult.Error("[red]Time of day is required![/]");
+                    return ValidationResult.Success();
+                }));
+        
+        DateTime userSessionEndTime = AnsiConsole.Prompt(
+            new TextPrompt<DateTime>("Add ending date of your session [cadetblue](yyyy-MM-dd HH:mm:ss)[/]:")
+                .Validate(input =>
+                {
+                    if (input.TimeOfDay == TimeSpan.Zero) return ValidationResult.Error("[red]Time of day is required![/]");
+                    if (input <= userSessionStartTime) return ValidationResult.Error("[red]The end date of your session can't be before the start date![/]");
+                    return ValidationResult.Success();
+                }));
+
+        decimal userSessionDuration = SessionsService.GetDuration(userSessionStartTime, userSessionEndTime);
+        databaseManager.WriteTable(userSessionStartTime, userSessionEndTime, userSessionDuration);
+        
+        Console.WriteLine("Session saved. Press any key to go back to menu.");
+        Console.ReadKey();
+    }
     public void StartSession(bool isSessionStarted)
     {
         if (isSessionStarted)

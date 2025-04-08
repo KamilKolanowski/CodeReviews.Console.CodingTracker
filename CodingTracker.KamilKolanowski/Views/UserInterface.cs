@@ -25,8 +25,12 @@ internal class UserInterface
             var selectedOption = Options.OptionDisplayNames
                 .FirstOrDefault(x => x.Value == operationChoice).Key;
             
+            
             switch (selectedOption)
             {
+                case Options.MenuOptions.AddSessionManually:
+                    AddSessionManually(_databaseManager);
+                    break;
                 case Options.MenuOptions.StartSession:
                     StartSession(_isSessionStarted);
                     _isSessionStarted = true;
@@ -49,9 +53,14 @@ internal class UserInterface
         }
     }
 
+    private void AddSessionManually(DatabaseManager databaseManager)
+    {
+        _sessionsController.AddSessionManually(databaseManager);
+    }
     private void StartSession(bool isSessionStarted)
     {
         _sessionsController.StartSession(isSessionStarted);
+    
     }
 
     private void EndSession(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

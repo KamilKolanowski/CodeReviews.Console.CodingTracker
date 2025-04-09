@@ -10,6 +10,8 @@ internal class SessionsController : IBaseController
     private static DateTime _startTime;
     private static DateTime _endTime;
     private decimal _duration; 
+    
+    PrepareReport _prepareReport = new();
 
     public void AddSessionManually(DatabaseManager databaseManager)
     {
@@ -112,6 +114,11 @@ internal class SessionsController : IBaseController
         
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey();
+    }
+
+    public void GetReports(Options.ReportingOptions reportingOptions)
+    {
+        _prepareReport.PreparePeriodicReport(reportingOptions);
     }
 
     public void QuitApplication(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

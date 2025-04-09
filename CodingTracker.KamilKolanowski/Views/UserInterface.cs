@@ -24,6 +24,14 @@ internal class UserInterface
 
             var selectedOption = Options.OptionDisplayNames
                 .FirstOrDefault(x => x.Value == operationChoice).Key;
+
+            var reportingChoice = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .AddChoices(Options.ReportingOptionDisplayNames.Values));
+            
+            var selectedReportingOption = Options.ReportingOptionDisplayNames
+                .FirstOrDefault(x => x.Value == reportingChoice).Key;
+            
             
             
             switch (selectedOption)
@@ -43,6 +51,9 @@ internal class UserInterface
                     break;
                 case Options.MenuOptions.ViewSessions:
                     ViewSessions();
+                    break;
+                case Options.MenuOptions.GetReport:
+                    GetReports(selectedReportingOption);
                     break;
                 case Options.MenuOptions.Quit:
                     QuitApplication(_isSessionStarted, _isSessionEnded, _databaseManager);
@@ -71,6 +82,23 @@ internal class UserInterface
     public void ViewSessions()
     {
         _sessionsController.ViewSessions(_databaseManager);
+    }
+
+    private void GetReports(Options.ReportingOptions reportingOptions)
+    {
+        switch (reportingOptions)
+        {
+            case Options.ReportingOptions.GetWeeklyReport:
+                _sessionsController.GetReports(Options.ReportingOptions.GetWeeklyReport);
+                break;
+            case Options.ReportingOptions.GetMonthlyReport:
+                _sessionsController.GetReports(Options.ReportingOptions.GetMonthlyReport);
+                break;
+            case Options.ReportingOptions.GetYearlyReport:
+                _sessionsController.GetReports(Options.ReportingOptions.GetYearlyReport);
+                break;
+        }
+        
     }
 
     public void QuitApplication(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

@@ -51,4 +51,5 @@ internal class DatabaseManager
         
         connection.Execute(query, new { StartDateTime = startDateTime, EndDateTime = endDateTime, Duration = duration });
     }
+    
 }

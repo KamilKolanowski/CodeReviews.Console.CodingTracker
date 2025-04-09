@@ -116,9 +116,29 @@ internal class SessionsController : IBaseController
         Console.ReadKey();
     }
 
-    public void GetReports(Options.ReportingOptions reportingOptions)
+    public void GetReports()
     {
-        _prepareReport.PreparePeriodicReport(reportingOptions);
+        var reportingChoice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .AddChoices(Options.ReportingOptionDisplayNames.Values));
+            
+        var selectedReportingOption = Options.ReportingOptionDisplayNames
+            .FirstOrDefault(x => x.Value == reportingChoice).Key;
+        
+        switch (selectedReportingOption)
+        {
+            case Options.ReportingOptions.GetWeeklyReport:
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetWeeklyReport);
+                break;
+            case Options.ReportingOptions.GetMonthlyReport:
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetMonthlyReport);
+                break;
+            case Options.ReportingOptions.GetYearlyReport:
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetYearlyReport);
+                break;
+        }
+        
+
     }
 
     public void QuitApplication(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

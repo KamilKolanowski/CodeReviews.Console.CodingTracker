@@ -24,14 +24,6 @@ internal class UserInterface
 
             var selectedOption = Options.OptionDisplayNames
                 .FirstOrDefault(x => x.Value == operationChoice).Key;
-
-            var reportingChoice = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .AddChoices(Options.ReportingOptionDisplayNames.Values));
-            
-            var selectedReportingOption = Options.ReportingOptionDisplayNames
-                .FirstOrDefault(x => x.Value == reportingChoice).Key;
-            
             
             
             switch (selectedOption)
@@ -53,7 +45,7 @@ internal class UserInterface
                     ViewSessions();
                     break;
                 case Options.MenuOptions.GetReport:
-                    GetReports(selectedReportingOption);
+                    GetReports();
                     break;
                 case Options.MenuOptions.Quit:
                     QuitApplication(_isSessionStarted, _isSessionEnded, _databaseManager);
@@ -71,7 +63,6 @@ internal class UserInterface
     private void StartSession(bool isSessionStarted)
     {
         _sessionsController.StartSession(isSessionStarted);
-    
     }
 
     private void EndSession(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)
@@ -84,21 +75,9 @@ internal class UserInterface
         _sessionsController.ViewSessions(_databaseManager);
     }
 
-    private void GetReports(Options.ReportingOptions reportingOptions)
+    private void GetReports()
     {
-        switch (reportingOptions)
-        {
-            case Options.ReportingOptions.GetWeeklyReport:
-                _sessionsController.GetReports(Options.ReportingOptions.GetWeeklyReport);
-                break;
-            case Options.ReportingOptions.GetMonthlyReport:
-                _sessionsController.GetReports(Options.ReportingOptions.GetMonthlyReport);
-                break;
-            case Options.ReportingOptions.GetYearlyReport:
-                _sessionsController.GetReports(Options.ReportingOptions.GetYearlyReport);
-                break;
-        }
-        
+        _sessionsController.GetReports();
     }
 
     public void QuitApplication(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

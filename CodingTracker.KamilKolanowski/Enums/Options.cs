@@ -26,8 +26,7 @@ internal class Options
     {
         GetWeeklyReport,
         GetMonthlyReport,
-        GetYearlyReport,
-        GroupingPeriod
+        GetYearlyReport
     };
 
     internal static readonly Dictionary<ReportingOptions, string> ReportingOptionDisplayNames = new()

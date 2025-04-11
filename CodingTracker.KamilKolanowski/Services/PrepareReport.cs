@@ -1,5 +1,4 @@
 using Spectre.Console;
-using System.Globalization;
 using CodingTracker.KamilKolanowski.Data;
 using CodingTracker.KamilKolanowski.Enums;
 
@@ -41,6 +40,4 @@ internal class PrepareReport
         Console.WriteLine("Press any key to go back to the main menu.");
         Console.ReadKey();
     }
-
-
 }

@@ -13,10 +13,19 @@ services:
       - ./Data/DatabaseQueries:/scripts
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1433"]
+      interval: 30s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
     command: >
       /bin/bash -c "
+      echo 'Starting SQL Server...';
       /opt/mssql/bin/sqlservr & 
-      sleep 20 && 
+      echo 'Waiting for SQL Server to start...';
+      sleep 60 && 
+      echo 'Running SQL script to create database and tables...';
       /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P dockerStrongPwd123 -i /scripts/CreateCodingSessionsTable.sql &&
       tail -f /dev/null
       "

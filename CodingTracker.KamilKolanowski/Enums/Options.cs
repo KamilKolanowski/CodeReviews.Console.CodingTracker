@@ -36,5 +36,15 @@ internal class Options
         { ReportingOptions.GetYearlyReport, "Get Yearly Report" }
     };
 
+    internal enum OrderingReport
+    {
+        Ascending,
+        Descending
+    }
 
+    internal static readonly Dictionary<OrderingReport, string> OrderingOptionDisplayNames = new()
+    {
+        { OrderingReport.Ascending, "ASC" },
+        { OrderingReport.Descending, "DESC" }
+    };
 }

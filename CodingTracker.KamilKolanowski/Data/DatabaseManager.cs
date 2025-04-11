@@ -1,13 +1,13 @@
+using CodingTracker.KamilKolanowski.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Data.SqlClient;
 using Dapper;
-
 
 namespace CodingTracker.KamilKolanowski.Data;
 
 internal class DatabaseManager
 {
-    private readonly string _connectionString;
+    private string _connectionString;
     internal DatabaseManager()
     {
         var config = new ConfigurationBuilder()
@@ -19,10 +19,16 @@ internal class DatabaseManager
     }
     internal class CodingSession
     {
-        public int Id { get; set; }
-        public DateTime StartDateTime { get; set; }
-        public DateTime EndDateTime { get; set; }
-        public decimal Duration { get; set; }
+        internal int Id { get; set; }
+        internal DateTime StartDateTime { get; set; }
+        internal DateTime EndDateTime { get; set; }
+        internal decimal Duration { get; set; }
+    }
+
+    internal class CodingReport
+    {
+        internal string Period { get; set; }
+        internal decimal TimeSpent { get; set; }
     }
     
     private SqlConnection CreateConnection()
@@ -50,6 +56,42 @@ internal class DatabaseManager
                        VALUES (@StartDateTime, @EndDateTime, @Duration)";
         
         connection.Execute(query, new { StartDateTime = startDateTime, EndDateTime = endDateTime, Duration = duration });
+    }
+
+    internal List<CodingReport> CreateReport(Options.ReportingOptions reportingOptions, string orderingReport)
+    {
+        var connection = CreateConnection();
+        connection.Open();
+
+        string selectList = "";
+        string groupingCol = "";
+        string orderingCol = "";
+        
+        switch (reportingOptions)
+        {
+            case Options.ReportingOptions.GetWeeklyReport:
+                groupingCol = "DATEPART(year, StartDateTime), DATEPART(week, StartDateTime)";
+                selectList = $"CONCAT('Week ', DATEPART(week, StartDateTime), ' of ', DATEPART(year, StartDateTime))";
+                orderingCol =
+                    $"DATEPART(year, StartDateTime) {orderingReport}, DATEPART(week, StartDateTime) {orderingReport}";
+                break;
+            case Options.ReportingOptions.GetMonthlyReport:
+                groupingCol = "DATEPART(year, StartDateTime), DATEPART(month, StartDateTime)";
+                selectList = $"CONCAT('Month ', DATEPART(month, StartDateTime), ' of ', DATEPART(year, StartDateTime))";
+                orderingCol =
+                    $"DATEPART(year, StartDateTime) {orderingReport}, DATEPART(month, StartDateTime) {orderingReport}";
+                break;
+            case Options.ReportingOptions.GetYearlyReport:
+                groupingCol = "DATEPART(year, StartDateTime)";
+                selectList = "DATEPART(year, StartDateTime)";
+                orderingCol = $"DATEPART(year, StartDateTime) {orderingReport}";
+                break;
+        }
+        
+        string query = $"SELECT {selectList} AS Period, SUM(Duration) AS TimeSpent FROM CodingTracker.TCSA.CodingSessions GROUP BY {groupingCol} ORDER BY {orderingCol}";
+        
+        var report = connection.Query<CodingReport>(query).ToList();
+        return report;
     }
     
 }

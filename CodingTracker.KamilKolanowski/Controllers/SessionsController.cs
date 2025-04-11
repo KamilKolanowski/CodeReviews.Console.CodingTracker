@@ -21,6 +21,8 @@ internal class SessionsController : IBaseController
                 {
                     if (input.TimeOfDay == TimeSpan.Zero)
                         return ValidationResult.Error("[red]Time of day is required![/]");
+                    if (input <= new DateTime(1753, 1, 1)) 
+                        return ValidationResult.Error($"[red]Date can't be lower than: [/][yellow]{new DateTime(1753, 1, 1)}[/]");
                     return ValidationResult.Success();
                 }));
         
@@ -28,8 +30,12 @@ internal class SessionsController : IBaseController
             new TextPrompt<DateTime>("Add ending date of your session [cadetblue](yyyy-MM-dd HH:mm:ss)[/]:")
                 .Validate(input =>
                 {
-                    if (input.TimeOfDay == TimeSpan.Zero) return ValidationResult.Error("[red]Time of day is required![/]");
-                    if (input <= userSessionStartTime) return ValidationResult.Error("[red]The end date of your session can't be before the start date![/]");
+                    if (input.TimeOfDay == TimeSpan.Zero) 
+                        return ValidationResult.Error("[red]Time of day is required![/]");
+                    if (input <= userSessionStartTime) 
+                        return ValidationResult.Error("[red]The end date of your session can't be before the start date![/]");
+                    if (input <= new DateTime(1753, 1, 1)) 
+                        return ValidationResult.Error($"[red]Date can't be lower than: [/][yellow]{new DateTime(1753, 1, 1)}[/]");
                     return ValidationResult.Success();
                 }));
 
@@ -124,21 +130,26 @@ internal class SessionsController : IBaseController
             
         var selectedReportingOption = Options.ReportingOptionDisplayNames
             .FirstOrDefault(x => x.Value == reportingChoice).Key;
+
+        var orderingChoice = AnsiConsole.Prompt(
+            new SelectionPrompt<Options.OrderingReport>()
+                .AddChoices(Options.OrderingOptionDisplayNames.Keys)
+                .UseConverter(opt => opt.ToString()));
+
+        var orderingOption = Options.OrderingOptionDisplayNames[orderingChoice];
         
         switch (selectedReportingOption)
         {
             case Options.ReportingOptions.GetWeeklyReport:
-                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetWeeklyReport);
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetWeeklyReport, orderingOption);
                 break;
             case Options.ReportingOptions.GetMonthlyReport:
-                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetMonthlyReport);
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetMonthlyReport, orderingOption);
                 break;
             case Options.ReportingOptions.GetYearlyReport:
-                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetYearlyReport);
+                _prepareReport.PreparePeriodicReport(Options.ReportingOptions.GetYearlyReport, orderingOption);
                 break;
         }
-        
-
     }
 
     public void QuitApplication(bool isSessionStarted, bool isSessionEnded, DatabaseManager databaseManager)

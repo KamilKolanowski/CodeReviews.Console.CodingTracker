@@ -14,23 +14,8 @@ internal class PrepareReport
         table.Border(TableBorder.Rounded);
         table.AddColumn("[lime]Period[/]");
         table.AddColumn("[lime]Time Spent (s)[/]");
-
-        var reportTable = new List<DatabaseManager.CodingReport>();
         
-        switch(reportingOptions)
-        {
-            case Options.ReportingOptions.GetWeeklyReport:
-                reportTable = _databaseManager.CreateReport(reportingOptions, orderingReport);
-                break;
-            case Options.ReportingOptions.GetMonthlyReport:
-                reportTable =_databaseManager.CreateReport(reportingOptions, orderingReport);
-                break;
-            case Options.ReportingOptions.GetYearlyReport:
-                reportTable = _databaseManager.CreateReport(reportingOptions, orderingReport);
-                break;
-        };
-
-        foreach (var row in reportTable)
+        foreach (var row in _databaseManager.CreateReport(reportingOptions, orderingReport))
         {
             table.AddRow($"[dodgerblue1]{row.Period}[/]", $"[dodgerblue1]{row.TimeSpent.ToString()}[/]");
         }

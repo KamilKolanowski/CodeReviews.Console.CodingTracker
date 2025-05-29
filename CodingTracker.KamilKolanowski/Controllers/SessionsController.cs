@@ -12,6 +12,7 @@ internal class SessionsController : IBaseController
     private decimal _duration; 
     
     PrepareReport _prepareReport = new();
+    SessionsService _sessionsService = new();
 
     public void AddSessionManually(DatabaseManager databaseManager)
     {
@@ -39,7 +40,7 @@ internal class SessionsController : IBaseController
                     return ValidationResult.Success();
                 }));
 
-        decimal userSessionDuration = SessionsService.GetDuration(userSessionStartTime, userSessionEndTime);
+        decimal userSessionDuration = _sessionsService.GetDuration(userSessionStartTime, userSessionEndTime);
         databaseManager.WriteTable(userSessionStartTime, userSessionEndTime, userSessionDuration);
         
         Console.WriteLine("Session saved. Press any key to go back to menu.");
@@ -56,7 +57,7 @@ internal class SessionsController : IBaseController
         }
         else
         {
-            _startTime = SessionsService.GetCurrentTime();
+            _startTime = _sessionsService.GetCurrentTime();
             Console.WriteLine($"Starting session at {_startTime}");
             Console.WriteLine("Session started. Press any key to go back to menu.");
             
@@ -68,8 +69,8 @@ internal class SessionsController : IBaseController
     {
         if (isSessionEnded && isSessionStarted)
         {
-            _endTime = SessionsService.GetCurrentTime();
-            _duration = SessionsService.GetDuration(_startTime, _endTime);
+            _endTime = _sessionsService.GetCurrentTime();
+            _duration = _sessionsService.GetDuration(_startTime, _endTime);
             
             databaseManager.WriteTable(_startTime, _endTime, _duration);
             Console.WriteLine($"Ending session at {_endTime} - Your session lasted {_duration} seconds.");
@@ -156,8 +157,8 @@ internal class SessionsController : IBaseController
     {
         if (!isSessionEnded && isSessionStarted)
         {
-            _endTime = SessionsService.GetCurrentTime();
-            _duration = SessionsService.GetDuration(_startTime, _endTime);
+            _endTime = _sessionsService.GetCurrentTime();
+            _duration = _sessionsService.GetDuration(_startTime, _endTime);
             
             databaseManager.WriteTable(_startTime, _endTime, _duration);
             Console.WriteLine($"Ending session at {_endTime} - Your session lasted {_duration} seconds.");

@@ -1,13 +1,13 @@
 namespace CodingTracker.KamilKolanowski.Services;
 
-internal class SessionsService
+public class SessionsService
 {
-    internal static DateTime GetCurrentTime()
+    public DateTime GetCurrentTime()
     {
         return DateTime.Now;
     }
 
-    internal static decimal GetDuration(DateTime startTime, DateTime endTime)
+    public decimal GetDuration(DateTime startTime, DateTime endTime)
     {
         TimeSpan duration = endTime - startTime;
         return (decimal)duration.TotalSeconds;
